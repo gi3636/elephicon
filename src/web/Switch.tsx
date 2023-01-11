@@ -13,7 +13,7 @@ export const Switch = memo(() => {
   };
 
   return (
-    <div className="switch">
+    <div className="switch" style={{ visibility: 'hidden' }}>
       <div
         className={
           state.loading || state.drag

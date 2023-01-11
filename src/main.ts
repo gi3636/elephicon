@@ -17,7 +17,7 @@ import i18next from 'i18next';
 
 import { createMenu } from './createMenu';
 import { setLocales } from './setLocales';
-import { mkico, mkicns } from './mkicons';
+import { mkico, mkicns, mkpng } from './mkicons';
 
 const store = new Store<StoreType>({
   configFileMode: 0o666,
@@ -81,8 +81,15 @@ const createWindow = () => {
   nativeTheme.themeSource = nativeTheme.shouldUseDarkColors ? 'dark' : 'light';
 
   ipcMain.handle('mime-check', (_e, filepath) => mime.lookup(filepath));
-  ipcMain.handle('make-ico', (_e, filepath) => mkico(filepath, store));
-  ipcMain.handle('make-icns', (_e, filepath) => mkicns(filepath, store));
+  ipcMain.handle('make-ico', (_e, filepath, fileName) =>
+    mkico(filepath, store, fileName)
+  );
+  ipcMain.handle('make-icns', (_e, filepath, fileName) =>
+    mkicns(filepath, store, fileName)
+  );
+  ipcMain.handle('make-png', (_e, base64, fileName) =>
+    mkpng(base64, store, fileName)
+  );
 
   ipcMain.handle('open-file-dialog', async () => {
     return dialog

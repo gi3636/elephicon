@@ -4,11 +4,14 @@ contextBridge.exposeInMainWorld('myAPI', {
   mimecheck: async (filepath: string): Promise<string | false> =>
     ipcRenderer.invoke('mime-check', filepath),
 
-  mkIco: async (filepath: string): Promise<Result> =>
-    ipcRenderer.invoke('make-ico', filepath),
+  mkIco: async (filepath: string, fileName?: string): Promise<Result> =>
+    ipcRenderer.invoke('make-ico', filepath, fileName),
 
-  mkIcns: async (filepath: string): Promise<Result> =>
-    ipcRenderer.invoke('make-icns', filepath),
+  mkIcns: async (filepath: string, fileName?: string): Promise<Result> =>
+    ipcRenderer.invoke('make-icns', filepath, fileName),
+
+  mkPng: async (filepath: string, fileName?: string): Promise<Result> =>
+    ipcRenderer.invoke('make-png', filepath, fileName),
 
   contextMenu: () => ipcRenderer.send('show-context-menu'),
 

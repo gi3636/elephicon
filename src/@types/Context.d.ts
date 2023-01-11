@@ -7,9 +7,11 @@ declare global {
 export interface IElectronAPI {
   mimecheck: (filepath: string) => Promise<string | false>;
 
-  mkIco: (filepath: string) => Promise<Result>;
+  mkIco: (filepath: string, fileName?: string) => Promise<Result>;
 
-  mkIcns: (filepath: string) => Promise<Result>;
+  mkIcns: (filepath: string, fileName?: string) => Promise<Result>;
+
+  mkPng: (base64: string, fileName?: string) => Promise<Result>;
 
   contextMenu: () => void;
 

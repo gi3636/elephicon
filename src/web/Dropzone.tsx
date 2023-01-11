@@ -4,8 +4,47 @@ import { AppContext } from './lib/AppContext';
 import { Switch } from './Switch';
 import { Elephant } from './Elephant';
 
+enum ImageType {
+  ICO = 'ico',
+  ICNS = 'icns',
+  PNG = 'png',
+}
 const { myAPI } = window;
 
+let list = [
+  {
+    type: ImageType.ICO,
+    fileName: 'logo',
+  },
+  {
+    type: ImageType.ICO,
+    fileName: 'logo-256',
+  },
+  {
+    type: ImageType.ICNS,
+    fileName: 'logo',
+  },
+  {
+    type: ImageType.ICNS,
+    fileName: 'logo-256',
+  },
+  {
+    type: ImageType.PNG,
+    fileName: 'logo',
+  },
+  {
+    type: ImageType.PNG,
+    fileName: 'logo-256',
+  },
+  {
+    type: ImageType.PNG,
+    fileName: 'tray',
+  },
+  {
+    type: ImageType.PNG,
+    fileName: 'tray-badge',
+  },
+];
 export const Dropzone = memo(() => {
   const { state, dispatch } = useContext(AppContext);
 
@@ -45,15 +84,55 @@ export const Dropzone = memo(() => {
 
         return;
       }
+      list.map((item) => {
+        switch (item.type) {
+          case ImageType.ICO:
+            myAPI
+              .mkIco(filepath, item.fileName)
+              .then((result) => afterConvert(result));
+            break;
+          case ImageType.ICNS:
+            myAPI
+              .mkIcns(filepath, item.fileName)
+              .then((result) => afterConvert(result));
+            break;
+          case ImageType.PNG:
+            getBase64(filepath, item.fileName).then((base64: any) => {
+              myAPI
+                .mkPng(base64, item.fileName)
+                .then((result) => afterConvert(result));
+            });
 
-      if (state.ico) {
-        myAPI.mkIco(filepath).then((result) => afterConvert(result));
-      } else {
-        myAPI.mkIcns(filepath).then((result) => afterConvert(result));
-      }
+            break;
+        }
+      });
     },
     [afterConvert, dispatch, state.ico]
   );
+
+  const getBase64 = (filepath: string, fileName: string) => {
+    let wantedWidth = 1024;
+    let wantedHeight = 1024;
+    if (fileName === 'logo-256') {
+      wantedWidth = 256;
+      wantedHeight = 256;
+    }
+    return new Promise(async function (resolve, reject) {
+      var img = document.createElement('img');
+      img.onload = function () {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = wantedWidth;
+        canvas.height = wantedHeight;
+        // @ts-ignore
+        ctx.drawImage(this, 0, 0, wantedWidth, wantedHeight);
+        var dataURI = canvas.toDataURL('image/png');
+        console.log('dataUri', dataURI);
+        resolve(dataURI);
+      };
+      img.src = filepath;
+    });
+  };
 
   const onDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     if (state.loading) return;

@@ -2,9 +2,7 @@ import { app } from 'electron';
 
 import fs from 'node:fs';
 import path from 'node:path';
-
 import Store from 'electron-store';
-
 import {
   setLogger,
   createICO,
@@ -25,15 +23,21 @@ const errorMessage = (err: string, desktop: boolean): Result => {
 
 export const mkico = async (
   filepath: string,
-  store: Store<StoreType>
+  store: Store<StoreType>,
+  fileName?: string
 ): Promise<Result> => {
   const isDesktop = store.get('desktop', true);
-  const dirname = isDesktop ? app.getPath('desktop') : path.dirname(filepath);
-  const basename = path.basename(filepath, path.extname(filepath));
+  const dirname = app.getPath('desktop') + '/icon/';
+  const basename = fileName || path.basename(filepath, path.extname(filepath));
 
   const num = store.get('quality', 2);
   const bmp = store.get('bmp', true);
-
+  if (!fs.existsSync(`${dirname}`)) {
+    fs.mkdirSync(`${dirname}`);
+  }
+  if (!fs.existsSync(dirname)) {
+    fs.mkdirSync(dirname);
+  }
   return fs.promises
     .readFile(filepath)
     .then(async (buffer) => {
@@ -59,14 +63,53 @@ export const mkico = async (
     .catch((err) => errorMessage(err, isDesktop));
 };
 
-export const mkicns = async (
-  filepath: string,
-  store: Store<StoreType>
+export const mkpng = async (
+  base64: string,
+  store: Store<StoreType>,
+  fileName?: string
 ): Promise<Result> => {
   const isDesktop = store.get('desktop', true);
-  const dirname = isDesktop ? app.getPath('desktop') : path.dirname(filepath);
-  const basename = path.basename(filepath, path.extname(filepath));
+  const dirname = app.getPath('desktop') + '/icon';
+  const basename = fileName;
+  //Find extension of file
+  const ext = base64.substring(
+    base64.indexOf('/') + 1,
+    base64.indexOf(';base64')
+  );
+  const fileType = base64.substring('data:'.length, base64.indexOf('/'));
+  //Forming regex to extract base64 data of file.
+  const regex = new RegExp(`^data:${fileType}\/${ext};base64,`, 'gi');
+  //Extract base64 data.
+  const base64Data = base64.replace(regex, '');
+  const filename = `${fileName}.${ext}`;
 
+  //Check that if directory is present or not.
+  if (!fs.existsSync(`${dirname}`)) {
+    fs.mkdirSync(`${dirname}`);
+  }
+  if (!fs.existsSync(dirname)) {
+    fs.mkdirSync(dirname);
+  }
+  fs.writeFileSync(dirname + filename, base64Data, 'base64');
+  clearCache();
+
+  return { type: 'success', log: `${basename}.png`, desktop: isDesktop };
+};
+
+export const mkicns = async (
+  filepath: string,
+  store: Store<StoreType>,
+  fileName?: string
+): Promise<Result> => {
+  const isDesktop = store.get('desktop', true);
+  const dirname = app.getPath('desktop') + '/icon';
+  const basename = fileName || path.basename(filepath, path.extname(filepath));
+  if (!fs.existsSync(`${dirname}`)) {
+    fs.mkdirSync(`${dirname}`);
+  }
+  if (!fs.existsSync(dirname)) {
+    fs.mkdirSync(dirname);
+  }
   const num = store.get('quality', 2);
 
   return fs.promises

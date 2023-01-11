@@ -13,27 +13,28 @@ build({
       buildResources: 'assets',
       output: 'release',
     },
+    publish: {
+      provider: 'github',
+      releaseType: 'release',
+    },
     linux: {
       category: 'Development',
       icon: 'assets/linux.icns',
       asarUnpack: 'dist/images/icon.png',
-      target: ['zip', 'AppImage'],
+      target: ['AppImage'],
       mimeTypes: ['image/png'],
     },
     win: {
       icon: 'assets/icon.ico',
-      target: ['appx', 'nsis'],
+      target: ['zip', 'nsis'],
+      publisherName: 'sprout2000',
+      fileAssociations: [
+        {
+          ext: ['png'],
+          description: 'PNG file',
+        },
+      ],
       asarUnpack: 'dist/images/icon.png',
-    },
-    appx: {
-      applicationId: 'sprout2000.Elephicon',
-      backgroundColor: '#1d3557',
-      displayName: 'Elephicon',
-      showNameOnTiles: true,
-      languages: ['en-US', 'ja-JP'],
-      identityName: process.env.IDENTITY_NAME,
-      publisher: process.env.PUBLISHER,
-      publisherDisplayName: 'sprout2000',
     },
     nsis: {
       oneClick: false,
@@ -45,12 +46,6 @@ build({
         '${productName}-${version}-${platform}-${arch}-installer.${ext}',
     },
     mac: {
-      publish: [
-        {
-          provider: 'github',
-          releaseType: 'release',
-        },
-      ],
       appId: process.env.APP_BUNDLE_ID,
       category: 'public.app-category.developer-tools',
       target: {
@@ -65,10 +60,6 @@ build({
         CFBundlePackageType: 'APPL',
         NSRequiresAquaSystemAppearance: false,
       },
-    },
-    dmg: {
-      icon: 'assets/dmg.icns',
-      sign: false,
     },
     afterSign:
       process.env.CSC_IDENTITY_AUTO_DISCOVERY === 'false'

@@ -23,10 +23,7 @@ const common: Configuration = {
       {
         test: /\.tsx?$/,
         exclude: /node_modules/,
-        use: [
-          { loader: 'ts-loader' },
-          { loader: 'ifdef-loader', options: { DEBUG: isDev } },
-        ],
+        loader: 'ts-loader',
       },
       {
         test: /\.s?css$/,
@@ -38,9 +35,8 @@ const common: Configuration = {
       },
     ],
   },
+  stats: 'errors-only',
   watch: isDev,
-  stats: 'minimal',
-  performance: { hints: false },
   devtool: isDev ? 'source-map' : undefined,
 };
 
@@ -50,6 +46,16 @@ const main: Configuration = {
   entry: {
     main: './src/main.ts',
   },
+  plugins: [
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: './assets/icon.png',
+          to: './images/icon.png',
+        },
+      ],
+    }),
+  ],
 };
 
 const preload: Configuration = {
@@ -72,16 +78,7 @@ const renderer: Configuration = {
       inject: 'body',
       template: './src/web/index.html',
     }),
-    new CopyWebpackPlugin({
-      patterns: [
-        {
-          from: './assets/icon.png',
-          to: './images/icon.png',
-        },
-      ],
-    }),
   ],
 };
 
-const config = isDev ? renderer : [main, preload, renderer];
-export default config;
+export default [main, preload, renderer];

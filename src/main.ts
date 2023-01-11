@@ -9,6 +9,8 @@ import {
 } from 'electron';
 
 import Store from 'electron-store';
+import log from 'electron-log';
+import { autoUpdater } from 'electron-updater';
 import { searchDevtools } from 'electron-search-devtools';
 
 import path from 'node:path';
@@ -19,6 +21,9 @@ import { createMenu } from './createMenu';
 import { setLocales } from './setLocales';
 import { mkico, mkicns, mkpng } from './mkicons';
 
+console.log = log.log;
+log.info('App starting...');
+
 const store = new Store<StoreType>({
   configFileMode: 0o666,
   defaults: {
@@ -28,21 +33,9 @@ const store = new Store<StoreType>({
     y: undefined,
     quality: 2,
     bmp: true,
-    language: i18next.resolvedLanguage,
+    ask: true,
   },
 });
-
-/// #if DEBUG
-const execPath =
-  process.platform === 'win32'
-    ? '../node_modules/electron/dist/electron.exe'
-    : '../node_modules/.bin/electron';
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-require('electron-reload')(__dirname, {
-  electron: path.resolve(__dirname, execPath),
-});
-/// #endif
 
 const isLinux = process.platform === 'linux';
 const isDarwin = process.platform === 'darwin';
@@ -95,7 +88,7 @@ const createWindow = () => {
     return dialog
       .showOpenDialog(mainWindow, {
         properties: ['openFile'],
-        title: i18next.t('Select a PNG File'),
+        title: `${i18next.t('Select a PNG File')}`,
         filters: [
           {
             name: 'PNG file',
@@ -107,7 +100,7 @@ const createWindow = () => {
         if (result.canceled) return;
         return result.filePaths[0];
       })
-      .catch((err): void => console.log(err));
+      .catch((err) => console.log(err));
   });
 
   const menu = createMenu(mainWindow, store);
@@ -127,11 +120,58 @@ const createWindow = () => {
       .catch((err) => console.log(err));
   }
 
+  if (isDarwin || isLinux) {
+    autoUpdater.logger = log;
+    autoUpdater.autoDownload = false;
+
+    if (store.get('ask')) autoUpdater.checkForUpdates();
+
+    autoUpdater.on('update-available', () => {
+      dialog
+        .showMessageBox(mainWindow, {
+          message: 'Found Updates',
+          detail:
+            'A new version is available.\nDo you want to download it now?',
+          buttons: ['Not now', 'OK'],
+          defaultId: 1,
+          cancelId: 0,
+          checkboxLabel: 'No update notifications required.',
+        })
+        .then((result) => {
+          if (result.response === 1) {
+            log.info('User chose to update...');
+            autoUpdater.downloadUpdate();
+          } else {
+            log.info('User refused to update...');
+            if (result.checkboxChecked) {
+              log.info('User rejected the update notification.');
+              store.set('ask', false);
+            }
+          }
+        });
+    });
+
+    autoUpdater.on('update-not-available', () => {
+      log.info('No updates available.');
+    });
+
+    autoUpdater.on('update-downloaded', () => {
+      log.info('Updates downloaded...');
+      dialog
+        .showMessageBox(mainWindow, {
+          message: 'Install Updates',
+          detail: 'Updates downloaded.\nPlease restart Elephicon...',
+        })
+        .then(() => {
+          setImmediate(() => autoUpdater.quitAndInstall());
+        })
+        .catch((err) => log.info(`Updater Error: ${err}`));
+    });
+  }
+
   mainWindow.loadFile('dist/index.html');
   mainWindow.once('ready-to-show', () => {
-    if (isDevelop) {
-      mainWindow.webContents.openDevTools({ mode: 'detach' });
-    }
+    if (isDevelop) mainWindow.webContents.openDevTools({ mode: 'detach' });
     mainWindow.show();
   });
 
@@ -140,9 +180,8 @@ const createWindow = () => {
   });
 
   mainWindow.once('close', () => {
-    const pos = mainWindow.getPosition();
-    store.set('x', pos[0]);
-    store.set('y', pos[1]);
+    const { x, y } = mainWindow.getBounds();
+    store.set({ x, y });
   });
 };
 
@@ -150,8 +189,9 @@ if (!gotTheLock && !isDarwin) {
   app.exit();
 } else {
   app.whenReady().then(() => {
-    const locale = store.get('language');
+    const locale = store.get('language') || app.getLocale();
     setLocales(locale);
+    store.set('language', locale);
 
     createWindow();
   });

@@ -1,31 +1,35 @@
 # Elephicon
 
-**Elephicon**, a GUI wrapper for [png2icons](https://github.com/idesis-gmbh/png2icons), **generates [Apple ICNS](https://en.wikipedia.org/wiki/Apple_Icon_Image_format) and [Microsoft ICO](<https://en.wikipedia.org/wiki/ICO_(file_format)>) files from PNG files.**
-
 [![GitHub license](https://img.shields.io/github/license/sprout2000/elephicon)](https://github.com/sprout2000/elephicon/blob/master/LICENSE.md)
 ![GitHub all releases](https://img.shields.io/github/downloads/sprout2000/elephicon/total)
+![GitHub contributors](https://img.shields.io/github/contributors/sprout2000/elephicon)
 [![GitHub stars](https://img.shields.io/github/stars/sprout2000/elephicon)](https://github.com/sprout2000/elephicon/stargazers)
+
+**Elephicon**, a GUI wrapper for [png2icons](https://github.com/idesis-gmbh/png2icons), **generates [Apple ICNS](https://en.wikipedia.org/wiki/Apple_Icon_Image_format) and [Microsoft ICO](<https://en.wikipedia.org/wiki/ICO_(file_format)>) files from PNG files.**
 
 ## :green_book: Usage
 
 - The ideal input is a 24-bit PNG file with _1024x1024_ pixels and an alpha channel, but any other dimensions and most other PNG formats will do work.
 - If you only need to create ICO files, _256×256_ pixels will be enough.
 - It's also possible to create icon files from non-quadratic source PNGs.
+- Various settings are available from the context menu.
 
 <img width="50%" alt="animation" src="https://user-images.githubusercontent.com/52094761/144979888-d796c672-ee0a-44cc-bfa2-abce6513d192.gif" />
 
-## :gift: Download
+## :inbox_tray: Download
 
-### :desktop_computer: macOS (x64, arm64)
+### :computer: macOS & GNU/Linux
 
 You can download the latest version of _Elephicon_ from the releases page here:  
 [https://github.com/sprout2000/elephicon/releases](https://github.com/sprout2000/elephicon/releases)
 
-### :computer: Windows10, 11
+### :desktop_computer: Windows 10 & 11
 
-Download the latest version for Windows 10 and 11 at [Microsoft Store](https://www.microsoft.com/store/apps/9P1489W92ZDQ).
+You can get _(or upgrade to)_ the latest version of _Elephicon_ via [winget](https://github.com/microsoft/winget-cli):
 
-<a href='https://www.microsoft.com/store/apps/9P1489W92ZDQ'><img width="160px" src='https://developer.microsoft.com/en-us/store/badges/images/English_get-it-from-MS.png' alt='Badge'/></a>
+```sh
+winget install sprout2000.Elephicon
+```
 
 ## :rainbow: Embedded Sizes
 
@@ -57,7 +61,7 @@ Download the latest version for Windows 10 and 11 at [Microsoft Store](https://w
 | 日本語    | `ja` |     | Українська |  `uk`   |
 | Malayalam | `ml` |     | 简体中文   | `zh_CN` |
 
-## :hammer_and_wrench: Contributing
+## :beers: Contributing
 
 You can easily contribute to this repository by providing translation files.
 
@@ -68,9 +72,9 @@ You can easily contribute to this repository by providing translation files.
   ├── @types
   ├── createMenu.ts
   ├── locales
-+ │   ├── de.json
-  │   ├── en.json
-  │   └── ja.json
++ │   ├── de.json
+  │   ├── en.json
+  │   └── ja.json
   ├── main.ts
   ├── preload.ts
   ├── setLocales.ts
@@ -97,50 +101,17 @@ You can easily contribute to this repository by providing translation files.
   };
 ```
 
-3. And add entries for the language to `src/createMenu.ts`.
-
-```diff
-  const localeList = [
-    'en',
-    'ja',
-+   'de',
-  ];
-
-  const translate = (locale: string) => {
-    switch (locale) {
-      case 'en':
-        return 'English';
-      case 'ja':
-        return '日本語';
-+     case 'de':
-+       return 'Deutsch';
-      default:
-        return 'English';
-    }
-  };
-```
-
-4. And then please send a [pull request](https://github.com/sprout2000/elephicon/pulls) to this repository.
+3. And then please send a [pull request](https://github.com/sprout2000/elephicon/pulls) to this repository.
 
 ## :tada: Contributors
 
-**Special Thanks to:**
+Thanks go to these wonderful people :slightly_smiling_face::
 
-- [@whitebear60](https://github.com/whitebear60) [#223](https://github.com/sprout2000/elephicon/pull/223), [#225](https://github.com/sprout2000/elephicon/pull/225)
-- [@aerocyber](https://github.com/aerocyber) [#163](https://github.com/sprout2000/elephicon/pull/163)
-- [@umitseyhan75](https://github.com/umitseyhan75) [#159](https://github.com/sprout2000/elephicon/pull/159)
-- [@ArcherGu](https://github.com/ArcherGu) [#151](https://github.com/sprout2000/elephicon/pull/151)
-- [@LightwithoutLisonlyight](https://github.com/LightwithoutLisonlyight) [#140](https://github.com/sprout2000/elephicon/pull/140)
-- [@godrix](https://github.com/godrix) [#136](https://github.com/sprout2000/elephicon/pull/136)
-- [@kitt3911](https://github.com/kitt3911) [#135](https://github.com/sprout2000/elephicon/pull/135)
-- [@DrDeee](https://github.com/DrDeee) [#108](https://github.com/sprout2000/elephicon/pull/108)
+<a href="https://github.com/sprout2000/elephicon/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=sprout2000/elephicon" />
+</a>
 
-## :vertical_traffic_light: Privacy Policy
-
-- Elephicon and the developer do NOT collect any personal information or privacy-related information about the user.
-- Elephicon and the developer do NOT collect the information of files opened by Elephicon.
-
-## :copyright: License
+## :copyright: Copyright
 
 ### [png2icons](https://github.com/idesis-gmbh/png2icons)
 
@@ -148,5 +119,4 @@ MIT © [idesis GmbH](https://www.idesis.de), Rellinghauser Straße 334F, D-45136
 
 ### Elephicon
 
-Copyright(c) 2020 sprout2000 and other contributors  
-[MIT](https://github.com/sprout2000/elephicon/blob/master/LICENSE.md) Licensed
+Copyright(c) 2020 sprout2000 and other contributors
